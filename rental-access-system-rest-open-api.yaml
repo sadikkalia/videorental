@@ -1,0 +1,113 @@
+openapi: 3.0.1
+info:
+  title: Video-Rental-REST-API
+  description: REST API
+  version: 'v1'
+servers:
+  - url: 'http://localhost:8080'
+    description: Endpoint URL
+paths:
+  /api/v1/rent:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                timestamp:
+                  type: number
+                films:
+                  type: array
+            examples:
+              '0':
+                value: '{ "customerId": "4", "timestamp": 1633857435780, "films": [ { "filmId": "1", "days": 3 }, { "filmId": "2", "days": 5 }, { "filmId": "3", "days": 6 } ]}'
+      responses:
+        '200':
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalResponseDTO'
+              examples:
+                '0':
+                  value: >-
+                    {"totalPrice":270,"rentalId":"7cfe91f8-c190-47b9-aed5-903d126cdb62","films":[{"filmId":"1","days":3,"price":120},{"filmId":"2","days":5,"price":90},{"filmId":"3","days":6,"price":60}]}
+        '400':
+          description: parameter validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+              examples:
+                '1':
+                  value: >-
+                    {  "message": "Customer not found!"  }
+                '2':
+                  value: >-
+                    {  "message": "Film not found!"  }
+                '3':
+                  value: >-
+                    {  "message": "Number of days rented less than 1!"  }
+
+  /api/v1/return:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                timestamp:
+                  type: number
+                films:
+                  type: array
+            examples:
+              '0':
+                value: '{ "rentalId" : "7cfe91f8-c190-47b9-aed5-903d126cdb62", "timestamp" : 1634379071000, "films" : [ { "filmId" : "1" }, { "filmId" : "2" }, { "filmId" : "3" } ] }'
+      responses:
+        '200':
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalResponseDTO'
+              examples:
+                '0':
+                  value: >-
+                    {"totalPrice":150,"films":[{"filmId":"1","days":3,"price":120},{"filmId":"2","days":1,"price":30},{"filmId":"3","days":0,"price":0}]}
+        '400':
+          description: parameter error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+              examples:
+                '1':
+                  value: >-
+                    {  "message": "Film not found in rental order!"  }
+                '2':
+                  value: >-
+                    {  "message": "Film not found!"  }
+
+components:
+  schemas:
+    RentalResponseDTO:
+      type: object
+      properties:
+        totalPrice:
+          type: integer
+        rentalId:
+          type: string
+        films:
+          type: array
+    ErrorMessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
